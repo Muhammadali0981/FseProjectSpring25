@@ -1,66 +1,212 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./components/Login_Page";
 import Student_Login_Page from "./components/Student_Login";
 import Admin_Login_Page from "./components/Admin_Login";
+import Student_Signup from "./components/Student_Signup";
+import Admin_Signup from "./components/Admin_Signup";
+import About from "./components/About";
+import Contact from "./components/Contact";
+import Library from "./components/Library";
+import NewBookRequest from "./components/NewBookRequest";
+import StudentRequests from "./components/StudentRequests";
+import AdminDashboard from "./components/AdminDashboard";
+
+const Navigation: React.FC = () => {
+  const { user, userRole, logout } = useAuth();
+
+  return (
+    <nav className="bg-white shadow-lg fixed w-full z-10">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <div className="flex-shrink-0 flex items-center">
+              <Link to="/" className="text-2xl font-bold text-blue-800">
+                Library
+              </Link>
+            </div>
+            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <Link
+                to="/about"
+                className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+              >
+                About
+              </Link>
+              <Link
+                to="/contact"
+                className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+              >
+                Contact
+              </Link>
+              {userRole === 'student' && (
+                <>
+                  <Link
+                    to="/library"
+                    className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+                  >
+                    Library
+                  </Link>
+                  <Link
+                    to="/requests"
+                    className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+                  >
+                    My Requests
+                  </Link>
+                  <Link
+                    to="/new-book-request"
+                    className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+                  >
+                    Request New Book
+                  </Link>
+                </>
+              )}
+              {userRole === 'admin' && (
+                <>
+                  <Link
+                    to="/admin"
+                    className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+                  >
+                    Dashboard
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="hidden sm:ml-6 sm:flex sm:items-center">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-gray-700">Welcome, {user.name}</span>
+                <button
+                  onClick={logout}
+                  className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-all duration-300"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-all duration-300"
+              >
+                Login
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
 
 const App = () => {
   return (
-    <Router>
-      {/* Navigation Bar */}
-      <div className="fixed top-0 w-full p-4 bg-blue-400 text-white shadow-lg flex justify-between z-50">
-        <span><Link to="/" style={{ color: "white"}}> FAST NUCES Library App </Link></span>
-        <div>
-          <span className="ml-4">Login to access library</span>
-        </div>
-      </div>
-      {/* Routes for Different Pages */}
-      <Routes>
-        {/* Home Page */}
-        <Route
-          path="/"
-          element={
-            <div className="flex flex-col items-center justify-center min-h-screen bg-blue-300 text-white pt-16 min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/Main_Page_Img.jpg')" }}>
-              <div className="z-20 grid grid-cols-1 sm:grid-cols-3 gap-6 p-6 w-360">
-
-                {/* Library Box */}
-                <div className="p-6 bg-blue-600/60 hover:bg-blue-800 rounded-lg shadow-lg w-60 text-center">
-                  <h2 className="text-xl font-semibold mb-2">Explore The Library</h2>
-                  <Link to="/login" className="block bg-white text-blue-500 px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition"> 
-                    Login 
-                  </Link>
+    <AuthProvider>
+      <Router>
+        <Navigation />
+        {/* Routes for Different Pages */}
+        <Routes>
+          {/* Home Page */}
+          <Route
+            path="/"
+            element={
+              <div className="relative flex flex-col items-center justify-center min-h-screen pt-16">
+                {/* Background Image with Overlay */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                  style={{ backgroundImage: "url('/Main_Page_Img.jpg')" }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-900/70 via-blue-800/60 to-blue-700/50"></div>
                 </div>
 
-                {/* About Page Box */}
-                <div className="p-6 bg-blue-600/60 hover:bg-blue-800 rounded-lg shadow-lg w-60 text-center">
-                  <h2 className="text-xl font-semibold mb-2">Learn about our services</h2>
-                  <Link to="/about" className="block bg-white text-blue-500 px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition"> 
-                    Go to About Page
-                  </Link>
-                </div>
+                {/* Content */}
+                <div className="relative z-20 grid grid-cols-1 sm:grid-cols-3 gap-8 p-8 max-w-6xl mx-auto">
+                  {/* Library Box */}
+                  <div className="transform transition-all duration-300 hover:scale-105 p-8 bg-white/20 backdrop-blur-sm rounded-xl shadow-2xl border border-white/30 hover:border-white/50">
+                    <h2 className="text-2xl font-bold mb-4 text-white">Explore The Library</h2>
+                    <p className="text-blue-100 mb-6">Access our vast collection of books and resources</p>
+                    <Link 
+                      to="/login" 
+                      className="inline-block bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 hover:text-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    > 
+                      Login 
+                    </Link>
+                  </div>
 
-                {/* Contact Page Box */}
-                <div className="p-6 bg-blue-600/60 hover:bg-blue-800 rounded-lg shadow-lg w-60 text-center">
-                  <h2 className="text-xl font-semibold mb-2">Contact us for inquiries</h2>
-                  <Link to="/contact" className="block bg-white text-blue-500 px-4 py-2 rounded-lg font-bold hover:bg-gray-200 transition"> 
-                    Go to Contact Page
-                  </Link>
+                  {/* About Page Box */}
+                  <div className="transform transition-all duration-300 hover:scale-105 p-8 bg-white/20 backdrop-blur-sm rounded-xl shadow-2xl border border-white/30 hover:border-white/50">
+                    <h2 className="text-2xl font-bold mb-4 text-white">Our Services</h2>
+                    <p className="text-blue-100 mb-6">Discover what we offer to our students and faculty</p>
+                    <Link 
+                      to="/about" 
+                      className="inline-block bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 hover:text-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    > 
+                      Learn More
+                    </Link>
+                  </div>
+
+                  {/* Contact Page Box */}
+                  <div className="transform transition-all duration-300 hover:scale-105 p-8 bg-white/20 backdrop-blur-sm rounded-xl shadow-2xl border border-white/30 hover:border-white/50">
+                    <h2 className="text-2xl font-bold mb-4 text-white">Contact Us</h2>
+                    <p className="text-blue-100 mb-6">Get in touch with our support team</p>
+                    <Link 
+                      to="/contact" 
+                      className="inline-block bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 hover:text-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    > 
+                      Contact Now
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          }
-        />
+            }
+          />
 
-        {/* Login Page */}
-        <Route path="/login" element={ 
-          <div className="w-screen flex flex-col justify-center items-center"><Login /></div>
-        } />
-        <Route path="/stdlogin" element={<Student_Login_Page />} />
-        <Route path="/admlogin" element={<Admin_Login_Page />} />
-        <Route path="/stdsignup" element={<Student_Login_Page />} />
-        <Route path="/admsignup" element={<Admin_Login_Page />} />
-      </Routes>
-    </Router>
+          {/* Public Pages */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/stdlogin" element={<Student_Login_Page />} />
+          <Route path="/admlogin" element={<Admin_Login_Page />} />
+          <Route path="/stdsignup" element={<Student_Signup />} />
+          <Route path="/admsignup" element={<Admin_Signup />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="/library"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <Library />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/requests"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentRequests />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/new-book-request"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <NewBookRequest />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 

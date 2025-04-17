@@ -2,7 +2,9 @@
     "name": "FseProjectSpring25",
     "version": "1.0.0",
     "scripts": {
-      "dev": "concurrently \"cd Backend && npm start\" \"cd Frontend && npm run dev\""
+        "dev": "concurrently \"cd Backend && npm start\" \"cd Frontend && npm run dev\""
+    },
+    "devDependencies": {
+        "concurrently": "^9.1.2"
     }
-  }
-  
+}
