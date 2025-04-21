@@ -24,6 +24,24 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'admin'],
     required: true
   },
+  rollNumber: {
+    type: String,
+    required: function() {
+      return this.role === 'student';
+    },
+    trim: true,
+    unique: true,
+    sparse: true
+  },
+  employeeId: {
+    type: String,
+    required: function() {
+      return this.role === 'admin';
+    },
+    trim: true,
+    unique: true,
+    sparse: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

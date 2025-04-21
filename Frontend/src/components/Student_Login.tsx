@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import axiosInstance from "../api/axios";
+import { toast } from "react-toastify";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Student_Login_Page = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
+    email: "",
     rollNumber: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -18,12 +24,38 @@ const Student_Login_Page = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Replace with actual authentication
-    if (formData.rollNumber && formData.password) {
-      login('student');
+    setLoading(true);
+    
+    try {
+      const response = await axiosInstance.post('/auth/login', {
+        email: formData.email,
+        password: formData.password,
+        rollNumber: formData.rollNumber,
+        role: 'student'
+      });
+
+      const { token, user } = response.data;
+      
+      if (user.role !== 'student') {
+        toast.error('This login is for students only');
+        return;
+      }
+
+      // Store token and user data
+      login(token, user);
+      
+      // Show success message
+      toast.success('Login successful!');
+      
+      // Navigate to library
       navigate('/library');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,6 +69,20 @@ const Student_Login_Page = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-gray-700" htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-700" htmlFor="rollNumber">Roll Number</label>
               <input
@@ -53,23 +99,33 @@ const Student_Login_Page = () => {
 
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-gray-700" htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                placeholder="Enter your password"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+                >
+                  {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white mt-6 px-6 py-2.5 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+              disabled={loading}
+              className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white mt-6 px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:from-blue-700 hover:to-blue-800'}`}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
 
             <div className="text-center space-y-3 pt-3">

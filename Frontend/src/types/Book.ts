@@ -1,12 +1,17 @@
 export interface Book {
-  id: string;
-  name: string;
+  _id: string;
+  title: string;
   author: string;
-  genre: string;
-  available: boolean;
-  borrowedBy?: string;
-  borrowDate?: Date;
-  returnDate?: Date;
+  isbn: string;
+  category: string;
+  quantity: number;
+  description?: string;
+  publishedYear?: string;
+  publisher?: string;
+  location: string;
+  status: 'available' | 'borrowed';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type SortOrder = 'asc' | 'desc';
@@ -24,17 +29,19 @@ export interface BookSort {
 }
 
 export interface BookRequest {
-  id: string;
-  studentId: string;
-  bookId: string;
-  type: 'borrow' | 'return';
-  status: 'pending' | 'approved' | 'rejected';
+  _id: string;
+  student: string;
+  book: string;
+  status: 'pending' | 'approved' | 'rejected' | 'returned';
   requestDate: string;
-  processedDate?: string;
+  approvalDate?: string;
+  returnDate?: string;
+  dueDate?: string;
+  adminNotes?: string;
 }
 
 export interface NewBookRequest {
-  id: string;
+  _id: string;
   studentId: string;
   studentName: string;
   bookName: string;
