@@ -14,7 +14,8 @@ import Contact from "./components/Contact";
 import Library from "./components/Library";
 import NewBookRequest from "./components/NewBookRequest";
 import StudentRequests from "./components/StudentRequests";
-import AdminDashboard from "./components/AdminDashboard";
+import Abserboard from "./components/Admin_Dashboard";
+import Admin_AddBook from "./components/Admin_AddBook";
 
 const Navigation: React.FC = () => {
   const { user, userRole, logout } = useAuth();
@@ -203,8 +204,16 @@ const App = () => {
             path="/admin"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <AdminDashboard />
+                <Abserboard />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/add-book"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <Admin_AddBook />
+                </ProtectedRoute>
             }
           />
         </Routes>

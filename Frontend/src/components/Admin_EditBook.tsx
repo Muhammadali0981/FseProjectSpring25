@@ -90,7 +90,7 @@ const Admin_EditBook = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="title">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="title">
                   Book Title*
                 </label>
                 <input
@@ -99,14 +99,14 @@ const Admin_EditBook = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               {/* Author */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="author">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="author">
                   Author*
                 </label>
                 <input
@@ -115,14 +115,14 @@ const Admin_EditBook = () => {
                   name="author"
                   value={formData.author}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               {/* ISBN */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="isbn">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="isbn">
                   ISBN*
                 </label>
                 <input
@@ -131,14 +131,14 @@ const Admin_EditBook = () => {
                   name="isbn"
                   value={formData.isbn}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="category">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="category">
                   Category*
                 </label>
                 <select
@@ -146,7 +146,7 @@ const Admin_EditBook = () => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="">Select a category</option>
@@ -230,7 +230,7 @@ const Admin_EditBook = () => {
 
               {/* Location */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="location">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="location">
                   Library Location*
                 </label>
                 <input
@@ -240,7 +240,7 @@ const Admin_EditBook = () => {
                   value={formData.location}
                   onChange={handleChange}
                   placeholder="e.g., Shelf A-12"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -248,7 +248,7 @@ const Admin_EditBook = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="description">
+              <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="description">
                 Description
               </label>
               <textarea
@@ -257,7 +257,7 @@ const Admin_EditBook = () => {
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 

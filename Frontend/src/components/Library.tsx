@@ -102,11 +102,11 @@ const Library: React.FC = () => {
   };
 
   const navigateToMyBooks = () => {
-    navigate('/student/my-books');
+    navigate('/requests');
   };
 
   const navigateToNewRequest = () => {
-    navigate('/student/new-book-request');
+    navigate('/new-book-request');
   };
 
   return (
