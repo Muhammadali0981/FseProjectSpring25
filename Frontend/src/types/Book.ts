@@ -5,6 +5,7 @@ export interface Book {
   isbn: string;
   category: string;
   quantity: number;
+  available: number;
   description?: string;
   publishedYear?: string;
   publisher?: string;
@@ -17,14 +18,14 @@ export interface Book {
 export type SortOrder = 'asc' | 'desc';
 
 export interface BookFilter {
-  genre?: string;
+  category?: string;
   author?: string;
-  name?: string;
+  title?: string;
   available?: boolean;
 }
 
 export interface BookSort {
-  field: 'genre' | 'author' | 'name';
+  field: 'title' | 'author' | 'category';
   order: 'asc' | 'desc';
 }
 
