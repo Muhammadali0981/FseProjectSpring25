@@ -86,6 +86,8 @@ const Library: React.FC = () => {
   };
 
   const handleBorrowBook = async (bookId: string) => {
+    if (userRole !== 'student') return;
+    
     try {
       await axiosInstance.post('/student/borrow-request', { bookId });
       // Update the book's status in the local state
@@ -102,14 +104,17 @@ const Library: React.FC = () => {
   };
 
   const navigateToMyBooks = () => {
+    if (userRole !== 'student') return;
     navigate('/requests');
   };
 
   const navigateToNewRequest = () => {
+    if (userRole !== 'student') return;
     navigate('/new-book-request');
   };
 
   const navigateToAddBook = () => {
+    if (userRole !== 'admin') return;
     navigate('/admin/add-book');
   };
 

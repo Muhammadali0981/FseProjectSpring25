@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 const Admin_AddBook = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isbnError, setIsbnError] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -24,6 +25,21 @@ const Admin_AddBook = () => {
       ...prev,
       [name]: value
     }));
+
+    // Clear ISBN error when user starts typing
+    if (name === 'isbn') {
+      setIsbnError('');
+    }
+  };
+
+  const validateISBN = async (isbn: string) => {
+    try {
+      const response = await axiosInstance.get(`/admin/books/check-isbn/${isbn}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking ISBN:', error);
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +47,14 @@ const Admin_AddBook = () => {
     setLoading(true);
 
     try {
+      // Check if ISBN already exists
+      const isbnExists = await validateISBN(formData.isbn);
+      if (isbnExists) {
+        setIsbnError('A book with this ISBN already exists in the library');
+        setLoading(false);
+        return;
+      }
+
       await axiosInstance.post('/admin/books', formData);
       toast.success('Book added successfully!');
       navigate('/admin');
@@ -101,9 +125,14 @@ const Admin_AddBook = () => {
                   name="isbn"
                   value={formData.isbn}
                   onChange={handleChange}
-                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full text-black px-4 py-2 bg-[#ecfaff] border ${
+                    isbnError ? 'border-red-500' : 'border-blue-200'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   required
                 />
+                {isbnError && (
+                  <p className="mt-1 text-sm text-red-600">{isbnError}</p>
+                )}
               </div>
 
               {/* Category */}

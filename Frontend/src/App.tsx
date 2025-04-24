@@ -73,6 +73,12 @@ const Navigation: React.FC = () => {
                   >
                     Dashboard
                   </Link>
+                  <Link
+                    to="/library"
+                    className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+                  >
+                    Library
+                  </Link>
                 </>
               )}
             </div>
@@ -179,7 +185,7 @@ const App = () => {
           <Route
             path="/library"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
                 <Library />
               </ProtectedRoute>
             }

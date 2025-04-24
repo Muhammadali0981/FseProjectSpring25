@@ -269,6 +269,12 @@ const Admin_Dashboard = () => {
             >
               Add New Book
             </button>
+            <button 
+              onClick={() => window.location.href = '/library'}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300"
+            >
+              View Library
+            </button>
           </div>
         </div>
       </div>
