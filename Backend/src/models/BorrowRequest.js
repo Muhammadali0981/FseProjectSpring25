@@ -18,11 +18,11 @@ const borrowRequestSchema = new mongoose.Schema({
     },
     requestDate: {
         type: Date,
-        default: Date.now
+        default: () => new Date().toLocaleDateString('en-US')
     },
     borrowDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: () => new Date().toLocaleDateString('en-US')
     },
     approvalDate: {
         type: Date

@@ -124,9 +124,6 @@ const Admin_Dashboard = () => {
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-blue-800">Admin Dashboard</h1>
-            <div className="text-gray-600">
-              Welcome, {user?.name}
-            </div>
           </div>
 
           {/* Stats Overview */}
@@ -176,7 +173,7 @@ const Admin_Dashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.studentName}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.bookTitle}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(request.borrowDate).toLocaleDateString()}
+                          {request.requestDate}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
