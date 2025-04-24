@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 
 interface BorrowRequest {
   _id: string;
@@ -18,6 +19,7 @@ interface BorrowRequest {
 
 const Admin_Requests = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending');
@@ -65,12 +67,15 @@ const Admin_Requests = () => {
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-blue-800">Borrow Requests</h1>
-            <button
-              onClick={() => navigate('/admin')}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              ← Back to Dashboard
-            </button>
+            <div className="flex items-center space-x-4">
+              {user && <span className="text-gray-700">Welcome, {user.name}</span>}
+              <button
+                onClick={() => navigate('/admin')}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {/* Filter */}

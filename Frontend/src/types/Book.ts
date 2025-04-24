@@ -34,8 +34,12 @@ export interface BookRequest {
   student: string;
   book: string;
   status: 'pending' | 'approved' | 'rejected' | 'returned';
+  requestDate: string;
   borrowDate: string;
-  returnDate: string;
+  approvalDate?: string;
+  returnDate?: string;
+  dueDate?: string;
+  adminNotes?: string;
   actualReturnDate?: string;
   fine?: number;
   studentName?: string;
