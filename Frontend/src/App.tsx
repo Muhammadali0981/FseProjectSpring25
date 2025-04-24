@@ -16,6 +16,7 @@ import NewBookRequest from "./components/NewBookRequest";
 import StudentRequests from "./components/StudentRequests";
 import Abserboard from "./components/Admin_Dashboard";
 import Admin_AddBook from "./components/Admin_AddBook";
+import Admin_Books from "./components/Admin_Books";
 
 const Navigation: React.FC = () => {
   const { user, userRole, logout } = useAuth();
@@ -74,6 +75,12 @@ const Navigation: React.FC = () => {
                     Dashboard
                   </Link>
                   <Link
+                    to="/admin/books"
+                    className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
+                  >
+                    Manage Books
+                  </Link>
+                  <Link
                     to="/library"
                     className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
                   >
@@ -89,7 +96,7 @@ const Navigation: React.FC = () => {
                 <span className="text-gray-700">Welcome, {user.name}</span>
                 <button
                   onClick={logout}
-                  className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-all duration-300"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300"
                 >
                   Logout
                 </button>
@@ -97,7 +104,7 @@ const Navigation: React.FC = () => {
             ) : (
               <Link
                 to="/login"
-                className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-all duration-300"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300"
               >
                 Login
               </Link>
@@ -220,6 +227,14 @@ const App = () => {
               <ProtectedRoute allowedRoles={['admin']}>
                 <Admin_AddBook />
                 </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/books"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <Admin_Books />
+              </ProtectedRoute>
             }
           />
         </Routes>

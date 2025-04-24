@@ -115,7 +115,7 @@ const StudentRequests: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(request.borrowDate).toLocaleDateString()}
+                        {new Date(request.requestDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(request.returnDate).toLocaleDateString()}

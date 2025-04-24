@@ -84,7 +84,7 @@ const Student_Requests = () => {
 
         {/* Borrow/Return Requests */}
         <div className="bg-gradient-to-br from-blue-100 via-blue-50 to-blue-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Borrow/Return Requests</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Return Requests</h2>
           {borrowRequests.length === 0 ? (
             <p className="text-gray-500 text-center py-4">No borrow/return requests found.</p>
           ) : (

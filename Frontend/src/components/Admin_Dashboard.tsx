@@ -183,7 +183,7 @@ const Admin_Dashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             onClick={() => handleBorrowRequest(request._id, 'approve')}
-                            className="text-green-600 hover:text-green-900 mr-4"
+                            className="text-blue-600 hover:text-blue-900 mr-4"
                           >
                             Approve
                           </button>
@@ -239,7 +239,7 @@ const Admin_Dashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             onClick={() => handleNewBookRequest(request._id, 'approve')}
-                            className="text-green-600 hover:text-green-900 mr-4"
+                            className="text-blue-600 hover:text-blue-900 mr-4"
                           >
                             Approve
                           </button>

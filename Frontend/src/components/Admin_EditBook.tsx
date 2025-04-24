@@ -80,7 +80,7 @@ const Admin_EditBook = () => {
             <h1 className="text-3xl font-bold text-blue-800">Edit Book</h1>
             <button
               onClick={() => navigate('/admin/books')}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-blue-600 hover:text-blue-800"
             >
               ← Back to Books
             </button>
@@ -265,14 +265,14 @@ const Admin_EditBook = () => {
               <button
                 type="button"
                 onClick={() => navigate('/admin/books')}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300"
+                className="text-blue-600 hover:text-blue-800"
               >
-                Cancel
+                ← Back to Books
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ${
+                className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ${
                   saving ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >

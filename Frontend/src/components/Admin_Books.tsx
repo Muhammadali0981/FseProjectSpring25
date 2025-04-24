@@ -65,7 +65,7 @@ const Admin_Books = () => {
             <div className="flex space-x-4">
               <button
                 onClick={() => navigate('/admin')}
-                className="text-gray-600 hover:text-gray-800"
+                className="text-blue-600 hover:text-blue-800"
               >
                 ← Back to Dashboard
               </button>
@@ -152,18 +152,32 @@ const Admin_Books = () => {
                           <div className="text-sm text-gray-500">{book.location}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button
-                            onClick={() => navigate(`/admin/books/${book._id}`)}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(book._id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Delete
-                          </button>
+                          <div className="flex justify-end space-x-3">
+                            <button
+                              onClick={() => navigate(`/admin/edit-book/${book._id}`)}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (window.confirm('Are you sure you want to delete this book? This action cannot be undone.')) {
+                                  try {
+                                    await axiosInstance.delete(`/admin/books/${book._id}`);
+                                    toast.success('Book deleted successfully');
+                                    fetchBooks(currentPage);
+                                  } catch (error: any) {
+                                    const errorMessage = error.response?.data?.message || 'Failed to delete book';
+                                    toast.error(errorMessage);
+                                    console.error('Error deleting book:', error);
+                                  }
+                                }
+                              }}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

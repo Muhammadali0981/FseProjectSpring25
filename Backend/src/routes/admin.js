@@ -142,15 +142,44 @@ router.delete('/books/:id', verifyToken, isAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Book not found' });
     }
 
+    // Check for active borrows
     if (book.quantity !== book.available) {
-      return res.status(400).json({ message: 'Cannot delete book with active borrows' });
+      return res.status(400).json({ 
+        message: 'Cannot delete book with active borrows',
+        activeLoans: book.quantity - book.available
+      });
     }
 
-    await book.remove();
-    res.json({ message: 'Book deleted successfully' });
+    // Check for pending borrow requests
+    const pendingRequests = await BorrowRequest.countDocuments({
+      book: book._id,
+      status: 'pending'
+    });
+
+    if (pendingRequests > 0) {
+      return res.status(400).json({
+        message: 'Cannot delete book with pending borrow requests',
+        pendingRequests
+      });
+    }
+
+    // Use deleteOne instead of deprecated remove()
+    await Book.deleteOne({ _id: book._id });
+
+    res.json({ 
+      message: 'Book deleted successfully',
+      deletedBook: {
+        title: book.title,
+        author: book.author,
+        isbn: book.isbn
+      }
+    });
   } catch (error) {
     console.error('Error in deleteBook:', error);
-    res.status(500).json({ message: 'Error deleting book' });
+    res.status(500).json({ 
+      message: 'Error deleting book',
+      error: error.message 
+    });
   }
 });
 

@@ -74,7 +74,7 @@ const Admin_AddBook = () => {
             <h1 className="text-3xl font-bold text-blue-800">Add New Book</h1>
             <button
               onClick={() => navigate('/admin')}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-blue-600 hover:text-blue-800"
             >
               ← Back to Dashboard
             </button>
@@ -246,14 +246,14 @@ const Admin_AddBook = () => {
               <button
                 type="button"
                 onClick={() => navigate('/admin')}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300"
+                className="text-blue-600 hover:text-blue-800"
               >
-                Cancel
+                ← Back to Dashboard
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ${
+                className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ${
                   loading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
