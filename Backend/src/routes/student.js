@@ -10,10 +10,10 @@ const NewBookRequest = require('../models/NewBookRequest');
 router.get('/my-books', verifyToken, async (req, res) => {
     try {
         const requests = await BorrowRequest.find({
-            userId: req.user._id,
+            student: req.user.userId,
             status: 'approved'
         })
-        .populate('bookId')
+        .populate('book', 'title author')
         .sort({ createdAt: -1 });
 
         res.json(requests);
@@ -27,12 +27,25 @@ router.get('/my-books', verifyToken, async (req, res) => {
 router.get('/my-requests', verifyToken, async (req, res) => {
     try {
         const requests = await BorrowRequest.find({
-            userId: req.user._id
+            student: req.user.userId
         })
-        .populate('bookId')
+        .populate('book', 'title author')
         .sort({ createdAt: -1 });
 
-        res.json(requests);
+        const formattedRequests = requests.map(request => ({
+            _id: request._id,
+            book: request.book._id,
+            bookTitle: request.book.title,
+            status: request.status,
+            requestDate: request.requestDate,
+            approvalDate: request.approvalDate,
+            returnDate: request.returnDate,
+            dueDate: request.dueDate,
+            actualReturnDate: request.actualReturnDate,
+            fine: request.fine
+        }));
+
+        res.json(formattedRequests);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
@@ -62,8 +75,8 @@ router.post('/borrow-request', verifyToken, [
 
         // Check if user already has a pending or approved request for this book
         const existingRequest = await BorrowRequest.findOne({
-            userId: req.user._id,
-            bookId,
+            student: req.user.userId,
+            book: bookId,
             status: { $in: ['pending', 'approved'] }
         });
 
@@ -77,9 +90,10 @@ router.post('/borrow-request', verifyToken, [
 
         // Create new borrow request
         const borrowRequest = new BorrowRequest({
-            userId: req.user._id,
-            bookId,
-            status: 'pending'
+            student: req.user.userId,
+            book: bookId,
+            status: 'pending',
+            returnDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 days from now
         });
 
         await borrowRequest.save();
@@ -194,8 +208,8 @@ router.get('/books/:id', verifyToken, async (req, res) => {
 
         // Check if user has any active requests for this book
         const activeRequest = await BorrowRequest.findOne({
-            userId: req.user._id,
-            bookId: book._id,
+            student: req.user.userId,
+            book: book._id,
             status: { $in: ['pending', 'approved'] }
         });
 
@@ -203,6 +217,47 @@ router.get('/books/:id', verifyToken, async (req, res) => {
             ...book.toObject(),
             userRequest: activeRequest
         });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Return a borrowed book
+router.post('/borrow-requests/:requestId/return', verifyToken, async (req, res) => {
+    try {
+        const request = await BorrowRequest.findOne({
+            _id: req.params.requestId,
+            student: req.user.userId,
+            status: 'approved'
+        }).populate('book');
+
+        if (!request) {
+            return res.status(404).json({ message: 'Borrow request not found or not approved' });
+        }
+
+        // Calculate fine if returned late
+        const returnDate = new Date(request.returnDate);
+        const actualReturnDate = new Date();
+        let fine = 0;
+
+        if (actualReturnDate > returnDate) {
+            const daysLate = Math.ceil((actualReturnDate - returnDate) / (1000 * 60 * 60 * 24));
+            fine = daysLate * 1; // $1 per day late
+        }
+
+        // Update book availability
+        const book = await Book.findById(request.book._id);
+        book.available += 1;
+        await book.save();
+
+        // Update request
+        request.status = 'returned';
+        request.actualReturnDate = actualReturnDate;
+        request.fine = fine;
+        await request.save();
+
+        res.json(request);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

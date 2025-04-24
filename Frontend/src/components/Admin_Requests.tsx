@@ -5,12 +5,15 @@ import { toast } from 'react-toastify';
 
 interface BorrowRequest {
   _id: string;
-  bookId: string;
-  userId: string;
-  userName: string;
+  book: string;
+  student: string;
+  studentName: string;
   bookTitle: string;
-  requestDate: string;
-  status: 'pending' | 'approved' | 'rejected';
+  borrowDate: string;
+  returnDate: string;
+  actualReturnDate?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'returned';
+  fine?: number;
 }
 
 const Admin_Requests = () => {
@@ -38,10 +41,17 @@ const Admin_Requests = () => {
     fetchRequests();
   }, [filter]);
 
-  const handleAction = async (requestId: string, action: 'approve' | 'reject') => {
+  const handleAction = async (requestId: string, action: 'approve' | 'reject' | 'return') => {
     try {
-      await axiosInstance.put(`/admin/borrow-requests/${requestId}`, { status: action === 'approve' ? 'approved' : 'rejected' });
-      toast.success(`Request ${action}ed successfully`);
+      if (action === 'return') {
+        await axiosInstance.post(`/admin/borrow-requests/${requestId}/return`);
+        toast.success('Book returned successfully');
+      } else {
+        await axiosInstance.put(`/admin/borrow-requests/${requestId}`, { 
+          status: action === 'approve' ? 'approved' : 'rejected' 
+        });
+        toast.success(`Request ${action}ed successfully`);
+      }
       fetchRequests();
     } catch (error) {
       console.error('Error updating request:', error);
@@ -73,6 +83,7 @@ const Admin_Requests = () => {
               <option value="pending">Pending Requests</option>
               <option value="approved">Approved Requests</option>
               <option value="rejected">Rejected Requests</option>
+              <option value="returned">Returned Books</option>
             </select>
           </div>
 
@@ -104,14 +115,14 @@ const Admin_Requests = () => {
                     requests.map((request) => (
                       <tr key={request._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{request.userName}</div>
+                          <div className="text-sm font-medium text-gray-900">{request.studentName}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{request.bookTitle}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-500">
-                            {new Date(request.requestDate).toLocaleDateString()}
+                            {new Date(request.borrowDate).toLocaleDateString()}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -141,6 +152,14 @@ const Admin_Requests = () => {
                                 Reject
                               </button>
                             </>
+                          )}
+                          {request.status === 'approved' && (
+                            <button
+                              onClick={() => handleAction(request._id, 'return')}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              Return Book
+                            </button>
                           )}
                         </td>
                       </tr>

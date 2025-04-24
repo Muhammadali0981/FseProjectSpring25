@@ -45,16 +45,61 @@ app.use('/api/', limiter);
 app.use(express.json());
 app.use(mongoSanitize());
 
-// Connect to MongoDB with proper options
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/library', {
+// MongoDB connection options
+const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   autoIndex: true,
-  serverSelectionTimeoutMS: 5000,
+  serverSelectionTimeoutMS: 30000, // Increased timeout
   socketTimeoutMS: 45000,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+  family: 4, // Force IPv4
+  retryWrites: true,
+  retryReads: true,
+  maxPoolSize: 10,
+  minPoolSize: 5,
+  connectTimeoutMS: 30000,
+};
+
+// Connect to MongoDB with retry logic
+const connectWithRetry = async () => {
+  const maxRetries = 5;
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI, mongooseOptions);
+      console.log('Connected to MongoDB successfully');
+      return;
+    } catch (err) {
+      retries++;
+      console.error(`MongoDB connection attempt ${retries} failed:`, err.message);
+      
+      if (retries === maxRetries) {
+        console.error('Max retries reached. Could not connect to MongoDB');
+        process.exit(1);
+      }
+      
+      // Wait before retrying (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, Math.min(1000 * Math.pow(2, retries), 10000)));
+    }
+  }
+};
+
+// Initialize MongoDB connection
+connectWithRetry().catch(err => {
+  console.error('Initial MongoDB connection failed:', err);
+  process.exit(1);
+});
+
+// Handle MongoDB connection events
+mongoose.connection.on('error', err => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected. Attempting to reconnect...');
+  connectWithRetry();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
