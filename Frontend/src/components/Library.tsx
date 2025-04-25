@@ -6,12 +6,12 @@ import { Book, BookFilter, BookSort } from '../types/Book';
 import { useAuth } from '../context/AuthContext';
 
 const Library: React.FC = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [filters, setFilters] = useState<BookFilter>({});
-  const [sort, setSort] = useState<BookSort>({ field: 'genre', order: 'asc' });
+  const [sort, setSort] = useState<BookSort>({ field: 'category', order: 'asc' });
   const [loading, setLoading] = useState(true);
 
   // Fetch books from API
@@ -37,14 +37,14 @@ const Library: React.FC = () => {
     let result = [...books];
 
     // Apply filters
-    if (filters.genre) {
-      result = result.filter(book => book.category.toLowerCase().includes(filters.genre!.toLowerCase()));
+    if (filters.category) {
+      result = result.filter(book => book.category.toLowerCase().includes(filters.category!.toLowerCase()));
     }
     if (filters.author) {
       result = result.filter(book => book.author.toLowerCase().includes(filters.author!.toLowerCase()));
     }
-    if (filters.name) {
-      result = result.filter(book => book.title.toLowerCase().includes(filters.name!.toLowerCase()));
+    if (filters.title) {
+      result = result.filter(book => book.title.toLowerCase().includes(filters.title!.toLowerCase()));
     }
     if (filters.available !== undefined) {
       result = result.filter(book => book.status === (filters.available ? 'available' : 'borrowed'));
@@ -52,14 +52,14 @@ const Library: React.FC = () => {
 
     // Apply sorting
     result.sort((a, b) => {
-      const compareValue = (field: keyof BookSort['field']) => {
+      const compareValue = (field: keyof Book) => {
         const getValue = (book: Book) => {
           switch (field) {
-            case 'genre':
+            case 'category':
               return book.category;
             case 'author':
               return book.author;
-            case 'name':
+            case 'title':
               return book.title;
             default:
               return '';
@@ -78,7 +78,7 @@ const Library: React.FC = () => {
     setFilters(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSortChange = (field: BookSort['field']) => {
+  const handleSortChange = (field: 'title' | 'author' | 'category') => {
     setSort(prev => ({
       field,
       order: prev.field === field && prev.order === 'asc' ? 'desc' : 'asc'
@@ -86,6 +86,8 @@ const Library: React.FC = () => {
   };
 
   const handleBorrowBook = async (bookId: string) => {
+    if (userRole !== 'student') return;
+    
     try {
       await axiosInstance.post('/student/borrow-request', { bookId });
       // Update the book's status in the local state
@@ -102,11 +104,18 @@ const Library: React.FC = () => {
   };
 
   const navigateToMyBooks = () => {
-    navigate('/student/my-books');
+    if (userRole !== 'student') return;
+    navigate('/requests');
   };
 
   const navigateToNewRequest = () => {
-    navigate('/student/new-book-request');
+    if (userRole !== 'student') return;
+    navigate('/new-book-request');
+  };
+
+  const navigateToAddBook = () => {
+    if (userRole !== 'admin') return;
+    navigate('/admin/add-book');
   };
 
   return (
@@ -115,18 +124,30 @@ const Library: React.FC = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-blue-800">Library Catalog</h1>
           <div className="flex space-x-4">
-            <button 
-              onClick={navigateToMyBooks}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
-            >
-              My Borrowed Books
-            </button>
-            <button 
-              onClick={navigateToNewRequest}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300"
-            >
-              Request New Book
-            </button>
+            {userRole === 'student' && (
+              <>
+                <button 
+                  onClick={navigateToMyBooks}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                >
+                  My Borrowed Books
+                </button>
+                <button 
+                  onClick={navigateToNewRequest}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300"
+                >
+                  Request New Book
+                </button>
+              </>
+            )}
+            {userRole === 'admin' && (
+              <button 
+                onClick={navigateToAddBook}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300"
+              >
+                Add New Book
+              </button>
+            )}
           </div>
         </div>
 
@@ -144,8 +165,8 @@ const Library: React.FC = () => {
                 <label className="block text-sm font-medium text-blue-900 mb-1">Genre</label>
                 <input
                   type="text"
-                  value={filters.genre || ''}
-                  onChange={(e) => handleFilterChange('genre', e.target.value)}
+                  value={filters.category || ''}
+                  onChange={(e) => handleFilterChange('category', e.target.value)}
                   className="w-full px-4 py-2 bg-white border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Filter by genre"
                 />
@@ -164,8 +185,8 @@ const Library: React.FC = () => {
                 <label className="block text-sm font-medium text-blue-900 mb-1">Title</label>
                 <input
                   type="text"
-                  value={filters.name || ''}
-                  onChange={(e) => handleFilterChange('name', e.target.value)}
+                  value={filters.title || ''}
+                  onChange={(e) => handleFilterChange('title', e.target.value)}
                   className="w-full px-4 py-2 bg-white border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Filter by title"
                 />
@@ -200,64 +221,56 @@ const Library: React.FC = () => {
                 <table className="min-w-full divide-y divide-blue-200">
                   <thead className="bg-blue-50">
                     <tr>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors duration-200"
-                        onClick={() => handleSortChange('genre')}
-                      >
-                        Genre {sort.field === 'genre' && (sort.order === 'asc' ? '↑' : '↓')}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSortChange('title')}>
+                        Title
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors duration-200"
-                        onClick={() => handleSortChange('author')}
-                      >
-                        Author {sort.field === 'author' && (sort.order === 'asc' ? '↑' : '↓')}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSortChange('author')}>
+                        Author
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors duration-200"
-                        onClick={() => handleSortChange('name')}
-                      >
-                        Title {sort.field === 'name' && (sort.order === 'asc' ? '↑' : '↓')}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSortChange('category')}>
+                        Genre
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">
-                        Actions
+                      <th className="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">
+                        Available Copies
                       </th>
+                      {userRole === 'student' && (
+                        <th className="px-6 py-3 text-left text-xs font-medium text-blue-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-blue-200">
                     {filteredBooks.map((book) => (
-                      <tr key={book._id} className="hover:bg-blue-50 transition-colors duration-200">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
-                          {book.category}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
-                          {book.author}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
-                          {book.title}
-                        </td>
+                      <tr key={book._id} className="hover:bg-blue-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">{book.title}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">{book.author}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">{book.category}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             book.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
-                            {book.status.charAt(0).toUpperCase() + book.status.slice(1)}
+                            {book.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <button
-                            onClick={() => book.status === 'available' && handleBorrowBook(book._id)}
-                            className={`${
-                              book.status === 'available'
-                                ? 'text-blue-600 hover:text-blue-800'
-                                : 'text-gray-400 cursor-not-allowed'
-                            } font-medium mr-3`}
-                            disabled={book.status !== 'available'}
-                          >
-                            {book.status === 'available' ? 'Borrow' : 'Borrowed'}
-                          </button>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
+                          {book.available} / {book.quantity}
                         </td>
+                        {userRole === 'student' && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
+                            {book.status === 'available' && (
+                              <button
+                                onClick={() => handleBorrowBook(book._id)}
+                                className="text-blue-600 hover:text-blue-900"
+                              >
+                                Borrow
+                              </button>
+                            )}
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>

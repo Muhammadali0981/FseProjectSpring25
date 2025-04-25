@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 const Admin_AddBook = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isbnError, setIsbnError] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -24,6 +25,21 @@ const Admin_AddBook = () => {
       ...prev,
       [name]: value
     }));
+
+    // Clear ISBN error when user starts typing
+    if (name === 'isbn') {
+      setIsbnError('');
+    }
+  };
+
+  const validateISBN = async (isbn: string) => {
+    try {
+      const response = await axiosInstance.get(`/admin/books/check-isbn/${isbn}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking ISBN:', error);
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,9 +47,17 @@ const Admin_AddBook = () => {
     setLoading(true);
 
     try {
+      // Check if ISBN already exists
+      const isbnExists = await validateISBN(formData.isbn);
+      if (isbnExists) {
+        setIsbnError('A book with this ISBN already exists in the library');
+        setLoading(false);
+        return;
+      }
+
       await axiosInstance.post('/admin/books', formData);
       toast.success('Book added successfully!');
-      navigate('/admin/books');
+      navigate('/admin');
     } catch (error: any) {
       console.error('Error adding book:', error);
       toast.error(error.response?.data?.message || 'Failed to add book');
@@ -50,7 +74,7 @@ const Admin_AddBook = () => {
             <h1 className="text-3xl font-bold text-blue-800">Add New Book</h1>
             <button
               onClick={() => navigate('/admin')}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-blue-600 hover:text-blue-800"
             >
               ← Back to Dashboard
             </button>
@@ -60,7 +84,7 @@ const Admin_AddBook = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="title">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="title">
                   Book Title*
                 </label>
                 <input
@@ -69,14 +93,14 @@ const Admin_AddBook = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               {/* Author */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="author">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="author">
                   Author*
                 </label>
                 <input
@@ -85,14 +109,14 @@ const Admin_AddBook = () => {
                   name="author"
                   value={formData.author}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               {/* ISBN */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="isbn">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="isbn">
                   ISBN*
                 </label>
                 <input
@@ -101,14 +125,19 @@ const Admin_AddBook = () => {
                   name="isbn"
                   value={formData.isbn}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full text-black px-4 py-2 bg-[#ecfaff] border ${
+                    isbnError ? 'border-red-500' : 'border-blue-200'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   required
                 />
+                {isbnError && (
+                  <p className="mt-1 text-sm text-red-600">{isbnError}</p>
+                )}
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="category">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="category">
                   Category*
                 </label>
                 <select
@@ -116,7 +145,7 @@ const Admin_AddBook = () => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="">Select a category</option>
@@ -133,7 +162,7 @@ const Admin_AddBook = () => {
 
               {/* Quantity */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="quantity">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="quantity">
                   Quantity*
                 </label>
                 <input
@@ -143,14 +172,14 @@ const Admin_AddBook = () => {
                   value={formData.quantity}
                   onChange={handleChange}
                   min="1"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               {/* Published Year */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="publishedYear">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="publishedYear">
                   Published Year
                 </label>
                 <input
@@ -161,13 +190,13 @@ const Admin_AddBook = () => {
                   onChange={handleChange}
                   min="1800"
                   max={new Date().getFullYear()}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Publisher */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="publisher">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="publisher">
                   Publisher
                 </label>
                 <input
@@ -176,13 +205,13 @@ const Admin_AddBook = () => {
                   name="publisher"
                   value={formData.publisher}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               {/* Location */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="location">
+                <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="location">
                   Library Location*
                 </label>
                 <input
@@ -192,7 +221,7 @@ const Admin_AddBook = () => {
                   value={formData.location}
                   onChange={handleChange}
                   placeholder="e.g., Shelf A-12"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -200,7 +229,7 @@ const Admin_AddBook = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="description">
+              <label className="block text-sm font-medium text-blue-900 mb-1" htmlFor="description">
                 Description
               </label>
               <textarea
@@ -209,7 +238,7 @@ const Admin_AddBook = () => {
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-black px-4 py-2 bg-[#ecfaff] border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -217,14 +246,14 @@ const Admin_AddBook = () => {
               <button
                 type="button"
                 onClick={() => navigate('/admin')}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300"
+                className="text-blue-600 hover:text-blue-800"
               >
-                Cancel
+                ← Back to Dashboard
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ${
+                className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ${
                   loading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >

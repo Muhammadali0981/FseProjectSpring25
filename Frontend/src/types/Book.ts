@@ -5,6 +5,7 @@ export interface Book {
   isbn: string;
   category: string;
   quantity: number;
+  available: number;
   description?: string;
   publishedYear?: string;
   publisher?: string;
@@ -17,14 +18,14 @@ export interface Book {
 export type SortOrder = 'asc' | 'desc';
 
 export interface BookFilter {
-  genre?: string;
+  category?: string;
   author?: string;
-  name?: string;
+  title?: string;
   available?: boolean;
 }
 
 export interface BookSort {
-  field: 'genre' | 'author' | 'name';
+  field: 'title' | 'author' | 'category';
   order: 'asc' | 'desc';
 }
 
@@ -34,10 +35,15 @@ export interface BookRequest {
   book: string;
   status: 'pending' | 'approved' | 'rejected' | 'returned';
   requestDate: string;
+  borrowDate: string;
   approvalDate?: string;
   returnDate?: string;
   dueDate?: string;
   adminNotes?: string;
+  actualReturnDate?: string;
+  fine?: number;
+  studentName?: string;
+  bookTitle?: string;
 }
 
 export interface NewBookRequest {

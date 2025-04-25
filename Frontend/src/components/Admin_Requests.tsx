@@ -2,19 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 
 interface BorrowRequest {
   _id: string;
-  bookId: string;
-  userId: string;
-  userName: string;
+  book: string;
+  student: string;
+  studentName: string;
   bookTitle: string;
-  requestDate: string;
-  status: 'pending' | 'approved' | 'rejected';
+  borrowDate: string;
+  returnDate: string;
+  actualReturnDate?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'returned';
+  fine?: number;
 }
 
 const Admin_Requests = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending');
@@ -38,10 +43,17 @@ const Admin_Requests = () => {
     fetchRequests();
   }, [filter]);
 
-  const handleAction = async (requestId: string, action: 'approve' | 'reject') => {
+  const handleAction = async (requestId: string, action: 'approve' | 'reject' | 'return') => {
     try {
-      await axiosInstance.put(`/admin/borrow-requests/${requestId}`, { status: action === 'approve' ? 'approved' : 'rejected' });
-      toast.success(`Request ${action}ed successfully`);
+      if (action === 'return') {
+        await axiosInstance.post(`/admin/borrow-requests/${requestId}/return`);
+        toast.success('Book returned successfully');
+      } else {
+        await axiosInstance.put(`/admin/borrow-requests/${requestId}`, { 
+          status: action === 'approve' ? 'approved' : 'rejected' 
+        });
+        toast.success(`Request ${action}ed successfully`);
+      }
       fetchRequests();
     } catch (error) {
       console.error('Error updating request:', error);
@@ -55,12 +67,15 @@ const Admin_Requests = () => {
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-blue-800">Borrow Requests</h1>
-            <button
-              onClick={() => navigate('/admin')}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              ← Back to Dashboard
-            </button>
+            <div className="flex items-center space-x-4">
+              {user && <span className="text-gray-700">Welcome, {user.name}</span>}
+              <button
+                onClick={() => navigate('/admin')}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
 
           {/* Filter */}
@@ -73,6 +88,7 @@ const Admin_Requests = () => {
               <option value="pending">Pending Requests</option>
               <option value="approved">Approved Requests</option>
               <option value="rejected">Rejected Requests</option>
+              <option value="returned">Returned Books</option>
             </select>
           </div>
 
@@ -104,14 +120,14 @@ const Admin_Requests = () => {
                     requests.map((request) => (
                       <tr key={request._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{request.userName}</div>
+                          <div className="text-sm font-medium text-gray-900">{request.studentName}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{request.bookTitle}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-500">
-                            {new Date(request.requestDate).toLocaleDateString()}
+                            {new Date(request.borrowDate).toLocaleDateString()}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -141,6 +157,14 @@ const Admin_Requests = () => {
                                 Reject
                               </button>
                             </>
+                          )}
+                          {request.status === 'approved' && (
+                            <button
+                              onClick={() => handleAction(request._id, 'return')}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              Return Book
+                            </button>
                           )}
                         </td>
                       </tr>

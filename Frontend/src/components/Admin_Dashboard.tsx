@@ -124,9 +124,6 @@ const Admin_Dashboard = () => {
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-blue-800">Admin Dashboard</h1>
-            <div className="text-gray-600">
-              Welcome, {user?.name}
-            </div>
           </div>
 
           {/* Stats Overview */}
@@ -173,10 +170,10 @@ const Admin_Dashboard = () => {
                   ) : (
                     borrowRequests.map((request) => (
                       <tr key={request._id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.userName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.studentName}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.bookTitle}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(request.requestDate).toLocaleDateString()}
+                          {request.requestDate}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
@@ -186,7 +183,7 @@ const Admin_Dashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             onClick={() => handleBorrowRequest(request._id, 'approve')}
-                            className="text-green-600 hover:text-green-900 mr-4"
+                            className="text-blue-600 hover:text-blue-900 mr-4"
                           >
                             Approve
                           </button>
@@ -212,7 +209,7 @@ const Admin_Dashboard = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{user?.name}</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genre</th>
@@ -242,7 +239,7 @@ const Admin_Dashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             onClick={() => handleNewBookRequest(request._id, 'approve')}
-                            className="text-green-600 hover:text-green-900 mr-4"
+                            className="text-blue-600 hover:text-blue-900 mr-4"
                           >
                             Approve
                           </button>
@@ -268,6 +265,12 @@ const Admin_Dashboard = () => {
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
             >
               Add New Book
+            </button>
+            <button 
+              onClick={() => window.location.href = '/library'}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300"
+            >
+              View Library
             </button>
           </div>
         </div>
