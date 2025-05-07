@@ -51,10 +51,8 @@ const Admin_Dashboard = () => {
   // Fetch new book requests
   const fetchNewBookRequests = async () => {
     try {
-      const response = await axiosInstance.get('/admin/new-book-requests', {
-        params: { status: 'pending' }
-      });
-      setNewBookRequests(response.data);
+      const response = JSON.parse(localStorage.getItem('requests') ?? "[]");
+      setNewBookRequests(response);
     } catch (error) {
       console.error('Error fetching new book requests:', error);
       toast.error('Failed to load new book requests');
@@ -213,8 +211,6 @@ const Admin_Dashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genre</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -228,28 +224,9 @@ const Admin_Dashboard = () => {
                     newBookRequests.map((request) => (
                       <tr key={request._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.studentName}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.bookName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.author}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.genre}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-                            Pending
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button
-                            onClick={() => handleNewBookRequest(request._id, 'approve')}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleNewBookRequest(request._id, 'reject')}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Reject
-                          </button>
-                        </td>
                       </tr>
                     ))
                   )}

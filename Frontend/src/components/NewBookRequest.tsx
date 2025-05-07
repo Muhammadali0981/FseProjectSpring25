@@ -22,11 +22,17 @@ const NewBookRequest: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Send request to backend
-    console.log('Submitting new book request:', {
+    const data = {
       ...formData,
       studentId: user?.id,
-      studentName: user?.name
-    });
+      studentName: user?.name,
+      requestDate: new Date().toISOString()
+    };
+
+    const requests: any[] = JSON.parse(localStorage.getItem('requests') ?? "[]");
+    requests.push(data);
+    localStorage.setItem('requests', JSON.stringify(requests));
+    alert('Request submitted successfully');
   };
 
   return (
